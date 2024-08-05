@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Typing Test</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            background: #f0f0f0;
+            margin: 0;
+        }
+        .typing-form {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            width: 100%;
+            text-align: center;
+            margin: 20px;
+            max-width: 800px;
+        }
+        .header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .content-container {
+            background: #e0e0e0;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            position: relative;
+            min-height: 100px;
+            text-align: left;
+            font-size: 18px;
+            width: 100%;
+            box-sizing: border-box;
+            word-wrap: break-word;
+        }
+        .content-container span {
+            font-size: 18px;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+        .correct {
+            color: green;
+        }
+        .incorrect {
+            color: red;
+            text-decoration: line-through;
+        }
+        .input-container {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .input-container input {
+            width: 100%;
+            padding: 10px;
+            font-size: 18px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .timer {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .result {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .correct-count {
+            color: green;
+        }
+        .incorrect-count {
+            color: red;
+        }
+        .external-content, .time-selection {
+            margin: 20px 0;
+            width: 100%;
+        }
+        .external-content textarea, .time-selection select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .external-content button, .time-selection button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="typing-form">
+        <div class="header">Typing Test</div>
+        <div class="external-content">
+            <label for="external-input">Enter your own content:</label>
+            <textarea id="external-input" rows="3" placeholder="Type your content here..."></textarea>
+            <button onclick="setExternalContent()">Set Content</button>
+        </div>
+        <div class="time-selection">
+            <label for="time-select">Select time:</label>
+            <select id="time-select">
+                <option value="60">1 minute</option>
+                <option value="180">3 minutes</option>
+                <option value="300">5 minutes</option>
+                <option value="600">10 minutes</option>
+                <option value="900">15 minutes</option>
+            </select>
+            <button onclick="setTime()">Set Time</button>
+        </div>
+        <div class="timer"><span id="time">01:00</span> remaining</div>
+        <div class="content-container" id="content-container">
+            <!-- Content to type will be shown here -->
+        </div>
+        <div class="input-container">
+            <input type="text" id="typing-input" placeholder="Start typing here..." maxlength="200">
+        </div>
+        <div class="result" id="result">
+            <!-- Result will be shown here -->
+        </div>
+    </div>
+    <script>
+        const defaultContent = "Type this content to test your typing skills.";
+        let content = defaultContent;
+        const contentContainer = document.getElementById('content-container');
+        const typingInput = document.getElementById('typing-input');
+        const timerElement = document.getElementById('time');
+        const resultElement = document.getElementById('result');
+        const timeSelect = document.getElementById('time-select');
+        let timeLeft = 60;
+        let timer;
+
+        function initializeContent() {
+            contentContainer.innerHTML = '';
+            content.split(' ').forEach(word => {
+                word.split('').forEach(char => {
+                    const span = document.createElement('span');
+                    span.innerText = char;
+                    contentContainer.appendChild(span);
+                });
+                const space = document.createElement('span');
+                space.innerText = ' ';
+                contentContainer.appendChild(space);
+            });
+            typingInput.value = '';
+        }
+
+        function setExternalContent() {
+            const externalInput = document.getElementById('external-input').value;
+            if (externalInput) {
+                content = externalInput;
+                initializeContent();
+                resetTimer();
+            }
+        }
+
+        function setTime() {
+            timeLeft = parseInt(timeSelect.value, 10);
+            timerElement.innerText = formatTime(timeLeft);
+            resetTimer();
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+        }
+
+        typingInput.addEventListener('input', () => {
+            const inputText = typingInput.value.split('');
+            const spans = contentContainer.querySelectorAll('span');
+            spans.forEach((span, index) => {
+                const char = inputText[index];
+                if (char == null) {
+                    span.classList.remove('correct', 'incorrect');
+                } else if (char === span.innerText) {
+                    span.classList.add('correct');
+                    span.classList.remove('incorrect');
+                } else {
+                    span.classList.add('incorrect');
+                    span.classList.remove('correct');
+                }
+            });
+
+            // Check if complete
+            if (inputText.length === content.replace(/\s/g, '').length) {
+                clearInterval(timer);
+                showResult();
+                resetTimer();
+            }
+        });
+
+        function startTimer() {
+            timer = setInterval(() => {
+                timeLeft--;
+                timerElement.innerText = formatTime(timeLeft);
+                if (timeLeft === 0) {
+                    clearInterval(timer);
+                    showResult();
+                    resetTimer();
+                }
+            }, 1000);
+        }
+
+        function resetTimer() {
+            timerElement.innerText = formatTime(timeLeft);
+            clearInterval(timer);
+            timer = null;
+        }
+
+        function showResult() {
+            const spans = contentContainer.querySelectorAll('span');
+            let correct = 0;
+            let incorrect = 0;
+            spans.forEach(span => {
+                if (span.classList.contains('correct')) {
+                    correct++;
+                } else if (span.classList.contains('incorrect')) {
+                    incorrect++;
+                }
+            });
+            const accuracy = (correct / content.replace(/\s/g, '').length) * 100;
+            resultElement.innerHTML = `Correct: <span class="correct-count">${correct}</span>, Incorrect: <span class="incorrect-count">${incorrect}</span>, Accuracy: ${accuracy.toFixed(2)}%`;
+            swal({
+                title: "Test Completed!",
+                text: `Your accuracy is ${accuracy.toFixed(2)}%. Correct: ${correct}, Incorrect: ${incorrect}.`,
+                icon: "success",
+                button: "OK",
+            }).then(() => {
+                initializeContent();
+                resetTimer();
+            });
+        }
+
+        typingInput.addEventListener('focus', () => {
+            if (!timer) startTimer();
+        });
+
+        // Load sweetalert script
+        const script = document.createElement('script');
+        script.src = "https://unpkg.com/sweetalert/dist/sweetalert.min.js";
+        document.head.appendChild(script);
+
+        // Initialize with default content
+        initializeContent();
+    </script>
+</body>
+</html>
