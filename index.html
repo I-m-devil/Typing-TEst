@@ -5,109 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Typing Test</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            background: #f0f0f0;
-            margin: 0;
-        }
-        .typing-form {
-            background: white;
-            padding: 20px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            border-radius: 10px;
-            width: 100%;
-            text-align: center;
-            margin: 20px;
-            max-width: 800px;
-        }
-        .header {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .content-container {
-            background: #e0e0e0;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            position: relative;
-            min-height: 100px;
-            text-align: left;
-            font-size: 18px;
-            width: 100%;
-            box-sizing: border-box;
-            word-wrap: break-word;
-        }
-        .content-container span {
-            font-size: 18px;
-            display: inline-block;
-            transition: all 0.2s ease;
-        }
-        .correct {
-            color: green;
-        }
-        .incorrect {
-            color: red;
-            text-decoration: line-through;
-        }
-        .input-container {
-            margin-bottom: 20px;
-            width: 100%;
-        }
-        .input-container input {
-            width: 100%;
-            padding: 10px;
-            font-size: 18px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        .timer {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-        .result {
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .correct-count {
-            color: green;
-        }
-        .incorrect-count {
-            color: red;
-        }
-        .external-content, .time-selection {
-            margin: 20px 0;
-            width: 100%;
-        }
-        .external-content textarea, .time-selection select {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        .external-content button, .time-selection button {
-            padding: 10px 20px;
-            font-size: 16px;
-            margin-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="typings.css">
 </head>
 <body>
     <div class="typing-form">
         <div class="header">Typing Test</div>
-        <div class="external-content">
-            <label for="external-input">Enter your own content:</label>
-            <textarea id="external-input" rows="3" placeholder="Type your content here..."></textarea>
-            <button onclick="setExternalContent()">Set Content</button>
+        <div class="preset-content">
+            <label for="preset-select">Select a topic:</label>
+            <select id="preset-select" onchange="setPresetContent()">
+                <option value="" selected disabled>Select a topic</option>
+                <option value="latest_affairs">Latest Affairs in India</option>
+                <option value="technology_trends">Latest Technology Trends</option>
+                <option value="health_tips">Health Tips</option>
+            </select>
         </div>
+        
+        
         <div class="time-selection">
             <label for="time-select">Select time:</label>
             <select id="time-select">
@@ -126,12 +39,44 @@
         <div class="input-container">
             <input type="text" id="typing-input" placeholder="Start typing here..." maxlength="200">
         </div>
+        <div class="control-options">
+            <div class="option">
+                <label for="toggle-backspace" class="switch">
+                    <input type="checkbox" id="toggle-backspace" checked>
+                    <span class="slider round"></span>
+                </label>
+                <span>Allow Backspace</span>
+            </div>
+            <div class="option">
+                <label for="toggle-copypaste" class="switch">
+                    <input type="checkbox" id="toggle-copypaste" checked>
+                    <span class="slider round"></span>
+                </label>
+                <span>Allow Copy & Paste</span>
+            </div>
+        </div>
+        
+        
         <div class="result" id="result">
             <!-- Result will be shown here -->
         </div>
     </div>
+    <div id="device-warning-modal" class="modal">
+        <div class="modal-content">
+            <h2>Device Not Supported</h2>
+            <p>You can't use this feature on <span id="device-type"></span> devices.</p>
+            <button onclick="closeModal()">Close</button>
+        </div>
+    </div>
+    
     <script>
         const defaultContent = "Type this content to test your typing skills.";
+        const presetContents = {
+            latest_affairs: "The latest affairs in India include significant events like the G20 Summit, major policy changes in the economy, and key legislative actions in the parliament. These events are shaping the future direction of the country.",
+            technology_trends: "The latest technology trends include advancements in artificial intelligence, the growth of the internet of things (IoT), and the rise of quantum computing. These technologies are transforming industries and everyday life.",
+            health_tips: "Staying healthy involves regular exercise, a balanced diet, and adequate sleep. Recent studies emphasize the importance of mental health and suggest mindfulness practices for better well-being."
+        };
+
         let content = defaultContent;
         const contentContainer = document.getElementById('content-container');
         const typingInput = document.getElementById('typing-input');
@@ -143,18 +88,17 @@
 
         function initializeContent() {
             contentContainer.innerHTML = '';
-            content.split(' ').forEach(word => {
-                word.split('').forEach(char => {
-                    const span = document.createElement('span');
-                    span.innerText = char;
-                    contentContainer.appendChild(span);
-                });
-                const space = document.createElement('span');
-                space.innerText = ' ';
-                contentContainer.appendChild(space);
+            content.split('').forEach(char => {
+                const span = document.createElement('span');
+                span.innerText = char;
+                if (char === ' ') {
+                    span.style.marginRight = '5px'; // Adjust space width if needed
+                }
+                contentContainer.appendChild(span);
             });
             typingInput.value = '';
         }
+
 
         function setExternalContent() {
             const externalInput = document.getElementById('external-input').value;
@@ -164,6 +108,15 @@
                 resetTimer();
             }
         }
+        function setPresetContent() {
+        const presetSelect = document.getElementById('preset-select');
+        const selectedValue = presetSelect.value;
+        if (presetContents[selectedValue]) {
+            content = presetContents[selectedValue];
+            initializeContent();
+            resetTimer();
+        }
+    }
 
         function setTime() {
             timeLeft = parseInt(timeSelect.value, 10);
@@ -177,29 +130,30 @@
             return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
         }
 
-        typingInput.addEventListener('input', () => {
-            const inputText = typingInput.value.split('');
-            const spans = contentContainer.querySelectorAll('span');
-            spans.forEach((span, index) => {
-                const char = inputText[index];
-                if (char == null) {
-                    span.classList.remove('correct', 'incorrect');
-                } else if (char === span.innerText) {
-                    span.classList.add('correct');
-                    span.classList.remove('incorrect');
-                } else {
-                    span.classList.add('incorrect');
-                    span.classList.remove('correct');
+            typingInput.addEventListener('input', () => {
+                if (!timer) startTimer();
+                const inputText = typingInput.value.split('');
+                const spans = contentContainer.querySelectorAll('span');
+                spans.forEach((span, index) => {
+                    const char = inputText[index];
+                    if (char == null) {
+                        span.classList.remove('correct', 'incorrect');
+                    } else if (char === span.innerText) {
+                        span.classList.add('correct');
+                        span.classList.remove('incorrect');
+                    } else {
+                        span.classList.add('incorrect');
+                        span.classList.remove('correct');
+                    }
+                });
+
+                if (inputText.length === content.replace(/\s/g, '').length) {
+                    clearInterval(timer);
+                    showResult();
+                    resetTimer();
                 }
             });
 
-            // Check if complete
-            if (inputText.length === content.replace(/\s/g, '').length) {
-                clearInterval(timer);
-                showResult();
-                resetTimer();
-            }
-        });
 
         function startTimer() {
             timer = setInterval(() => {
@@ -254,6 +208,71 @@
 
         // Initialize with default content
         initializeContent();
+        const backspaceToggle = document.getElementById('toggle-backspace');
+        const copyPasteToggle = document.getElementById('toggle-copypaste');
+
+        typingInput.addEventListener('keydown', (e) => {
+            if (!backspaceToggle.checked && e.key === 'Backspace') {
+                e.preventDefault();
+            }
+        });
+
+        typingInput.addEventListener('paste', (e) => {
+            if (!copyPasteToggle.checked) {
+                e.preventDefault();
+            }
+        });
+
+        // Additional Event Listeners to prevent copy using context menu or shortcut
+        typingInput.addEventListener('copy', (e) => {
+            if (!copyPasteToggle.checked) {
+                e.preventDefault();
+            }
+        });
+
+        typingInput.addEventListener('cut', (e) => {
+            if (!copyPasteToggle.checked) {
+                e.preventDefault();
+            }
+        });
+
+        typingInput.addEventListener('contextmenu', (e) => {
+            if (!copyPasteToggle.checked) {
+                e.preventDefault();
+            }
+        });
+        function detectDevice() {
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        let deviceType = "desktop";
+
+        // Detect mobile devices
+        if (/android/i.test(userAgent)) {
+            deviceType = "Android";
+        } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            deviceType = "iOS";
+        } else if (/Windows Phone/.test(userAgent)) {
+            deviceType = "Windows Phone";
+        } else if (/tablet|ipad|playbook|silk|kindle/.test(userAgent)) {
+            deviceType = "Tablet";
+        }
+
+        if (deviceType !== "desktop") {
+            document.getElementById('device-type').textContent = deviceType;
+            showModal();
+        }
+    }
+
+    function showModal() {
+        document.getElementById('device-warning-modal').style.display = "flex";
+    }
+
+    function closeModal() {
+        document.getElementById('device-warning-modal').style.display = "none";
+    }
+
+    // Run device detection when the page loads
+    window.onload = detectDevice;
+
     </script>
 </body>
 </html>
