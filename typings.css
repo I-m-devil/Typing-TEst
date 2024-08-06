@@ -1,0 +1,329 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    background: #000000; /* Black background */
+    color: #ffffff; /* White text */
+    margin: 0;
+}
+
+.typing-form {
+    background: #1a1a1a; /* Dark background for form */
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* White shadow for 3D look */
+    border-radius: 10px;
+    width: 100%;
+    text-align: center;
+    margin: 20px;
+    max-width: 800px;
+    border: 1px solid #4d4d4d; /* Gray border */
+}
+
+.header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.content-container {
+    background: #333333; /* Dark gray background */
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    position: relative;
+    min-height: 100px;
+    text-align: left;
+    font-size: 18px;
+    width: 100%;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    border: 1px solid #4d4d4d; /* Gray border */
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2); /* White shadow */
+}
+
+.content-container span {
+    font-size: 18px;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.correct {
+    color: #00ff00; /* Bright green for correct text */
+}
+
+.incorrect {
+    color: #ff0000; /* Red for incorrect text */
+    text-decoration: line-through;
+}
+
+.input-container {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.input-container input {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    border: 1px solid #4d4d4d; /* Gray border */
+    border-radius: 5px;
+    box-sizing: border-box;
+    background: #262626; /* Dark background for inputs */
+    color: #ffffff; /* White text */
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1); /* Subtle white shadow */
+}
+
+.timer {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.result {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.correct-count {
+    color: #00ff00; /* Bright green */
+}
+
+.incorrect-count {
+    color: #ff0000; /* Red */
+}
+
+.external-content, .time-selection {
+    margin: 20px 0;
+    width: 100%;
+}
+
+.external-content textarea, .time-selection select {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #4d4d4d; /* Gray border */
+    border-radius: 5px;
+    box-sizing: border-box;
+    background: #262626; /* Dark background */
+    color: #ffffff; /* White text */
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1); /* Subtle white shadow */
+}
+
+.external-content button, .time-selection button {
+    padding: 10px 20px;
+    font-size: 16px;
+    margin-top: 10px;
+    background: #1a1a1a; /* Dark background */
+    color: #ffffff; /* White text */
+    border: 1px solid #4d4d4d; /* Gray border */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1); /* Subtle white shadow */
+}
+
+.external-content button:hover, .time-selection button:hover {
+    background: #333333; /* Darker background on hover */
+}
+.control-options {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.control-options .option {
+    display: flex;
+    align-items: center;
+}
+
+.control-options .option label {
+    margin-right: 10px;
+    position: relative;
+}
+
+.control-options .option span {
+    font-size: 16px;
+    color: #ffffff;
+}
+
+/* Toggle Switch */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    color: black;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #000000;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+.preset-content {
+    width: 100%;
+    margin-bottom: 20px;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+}
+
+.preset-content label {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #e0e0e0;
+}
+
+.preset-content select {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #333333;
+    color: #ffffff;
+    border: 2px solid #444444;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+    outline: none;
+    transition: all 0.3s ease;
+    appearance: none; /* Remove default arrow */
+    position: relative;
+}
+
+.preset-content select::after {
+    content: "\25BC";
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #ffffff;
+}
+
+.preset-content select:hover,
+.preset-content select:focus {
+    border-color: #ffffff;
+    background-color: #444444;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.preset-content option {
+    background-color: #333333;
+    color: #ffffff;
+    padding: 10px;
+}
+
+.preset-content option:hover {
+    background-color: #555555;
+}
+/* Modal container (hidden by default) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.8); /* Black w/ opacity */
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.5s;
+}
+
+/* Modal content */
+.modal-content {
+    background-color: #333333;
+    color: #ffffff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 2px solid #444444;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+    animation: slideIn 0.5s;
+}
+
+/* Modal header */
+.modal-content h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+/* Modal paragraph */
+.modal-content p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+/* Close button */
+.modal-content button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #555555;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.modal-content button:hover {
+    background-color: #777777;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+@keyframes slideIn {
+    from {transform: translateY(-50px);}
+    to {transform: translateY(0);}
+}
